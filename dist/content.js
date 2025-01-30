@@ -4565,76 +4565,40 @@
     }
     return compile(options)(postprocess(parse(options).document().write(preprocess()(value, encoding, true))));
   }
-  console.log("Keep Markdown extension loaded!");
-  function createPreviewPanel(noteId) {
-    console.log("Creating preview panel:", noteId);
+  function createPreviewPanel(noteId2) {
     const preview = document.createElement("div");
     preview.className = "keep-md-preview";
-    preview.id = `keep-md-preview-${noteId}`;
+    preview.id = `keep-md-preview-${noteId2}`;
     return preview;
   }
-  function handleNoteOpen(modalNote) {
-    console.log("Modal opened:", modalNote);
-    if (modalNote.querySelector(".keep-md-preview")) {
-      console.log("Preview already exists");
+  function handleNoteClick(event) {
+    const noteElement = event.target.closest(".IZ65Hb-n0tgWb");
+    if (!noteElement) return;
+    if (noteElement.querySelector(".keep-md-preview")) return;
+    const noteContent = noteElement.querySelector(".h1U9Be-YPqjbf");
+    if (!noteContent) return;
+    const noteContainer = noteElement.querySelector(".IZ65Hb-s2gQvd");
+    if (!noteContainer) {
+      console.log("Note container not found:", noteElement);
       return;
     }
-    const noteContent = modalNote.querySelector(".h1U9Be-YPqjbf");
-    if (!noteContent) {
-      console.log("No note content found");
-      return;
+    const wrapper = document.createElement("div");
+    wrapper.className = "keep-md-wrapper";
+    wrapper.id = `keep-md-wrapper-${noteId}`;
+    const contentWrapper = document.createElement("div");
+    contentWrapper.className = "keep-md-content";
+    while (noteContainer.firstChild) {
+      contentWrapper.appendChild(noteContainer.firstChild);
     }
-    const container = document.createElement("div");
-    container.className = "keep-md-container";
-    const parent = noteContent.parentElement;
-    parent.insertBefore(container, noteContent);
-    container.appendChild(noteContent);
-    const preview = createPreviewPanel(Date.now());
-    container.appendChild(preview);
-    const updatePreview = () => {
-      const markdownText = noteContent.innerText.replace(/^"(.*)"$/gm, "$1").replace(/\\n/g, "\n").replace(/\\"([^"]+)\\"/g, '"$1"').trim();
-      preview.innerHTML = micromark(markdownText);
-    };
-    updatePreview();
-    const observer = new MutationObserver((mutations) => {
-      updatePreview();
-    });
-    observer.observe(noteContent, {
-      childList: true,
-      characterData: true,
-      subtree: true
-    });
+    wrapper.appendChild(contentWrapper);
+    const preview = createPreviewPanel(noteId);
+    preview.innerHTML = micromark(noteContent.innerText);
+    wrapper.appendChild(preview);
+    noteContainer.appendChild(wrapper);
     console.log("Preview added:", preview.id);
   }
   function init() {
-    console.log("Initializing Keep Markdown");
-    const existingModal = document.querySelector(".VIpgJd-TUo6Hb");
-    if (existingModal) {
-      console.log("Found existing modal");
-      handleNoteOpen(existingModal);
-    }
-    const observer = new MutationObserver((mutations) => {
-      var _a, _b;
-      console.log("Mutation detected:", mutations.length, "changes");
-      for (const mutation of mutations) {
-        for (const node of mutation.addedNodes) {
-          if ((_a = node.classList) == null ? void 0 : _a.contains("VIpgJd-TUo6Hb")) {
-            console.log("Modal added:", node);
-            handleNoteOpen(node);
-          }
-        }
-        if (mutation.type === "attributes" && ((_b = mutation.target.classList) == null ? void 0 : _b.contains("VIpgJd-TUo6Hb"))) {
-          console.log("Modal attributes changed:", mutation.target);
-          handleNoteOpen(mutation.target);
-        }
-      }
-    });
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ["class"]
-    });
+    document.addEventListener("click", handleNoteClick);
   }
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);

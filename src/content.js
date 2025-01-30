@@ -1,47 +1,112 @@
 import {micromark} from 'micromark';
 
-// Create and inject the preview panel
-function createPreviewPanel() {
+console.log('Keep Markdown extension loaded!');
+
+// Create preview panel
+function createPreviewPanel(noteId) {
+    console.log('Creating preview panel:', noteId);
     const preview = document.createElement('div');
-    preview.className = 'markdown-preview hidden';
-    preview.id = 'markdown-preview';
-    document.body.appendChild(preview);
+    preview.className = 'keep-md-preview';
+    preview.id = `keep-md-preview-${noteId}`;
     return preview;
 }
 
-// Handle note clicks
-function handleNoteClick(event) {
-    const noteElement = event.target.closest('.IZ65Hb-n0tgWb'); // Google Keep's note class
-    if (!noteElement) return;
+function handleNoteOpen(modalNote) {
+    console.log('Modal opened:', modalNote);
+    
+    // Check if preview already exists
+    if (modalNote.querySelector('.keep-md-preview')) {
+        console.log('Preview already exists');
+        return;
+    }
 
-    const noteContent = noteElement.querySelector('.h1U9Be-YPqjbf'); // Note content element
-    if (!noteContent) return;
+    // Find the note content within the modal
+    const noteContent = modalNote.querySelector('.h1U9Be-YPqjbf');
+    if (!noteContent) {
+        console.log('No note content found');
+        return;
+    }
 
-    const preview = document.getElementById('markdown-preview') || createPreviewPanel();
-    preview.classList.remove('hidden');
-    document.body.classList.add('markdown-preview-active');
+    // Create a flex container for side-by-side layout
+    const container = document.createElement('div');
+    container.className = 'keep-md-container';
+    
+    // Move the note content into the container
+    const parent = noteContent.parentElement;
+    parent.insertBefore(container, noteContent);
+    container.appendChild(noteContent);
 
-    // Get the markdown content and render it
-    const markdownText = noteContent.textContent;
-    const htmlContent = micromark(markdownText);
-    preview.innerHTML = htmlContent;
+    // Create preview
+    const preview = createPreviewPanel(Date.now());
+    container.appendChild(preview);
+
+    // Function to update preview
+    const updatePreview = () => {
+        const markdownText = noteContent.innerText
+            .replace(/^"(.*)"$/gm, '$1')    // Remove surrounding quotes
+            .replace(/\\n/g, '\n')          // Handle newlines
+            .replace(/\\"([^"]+)\\"/g, '"$1"') // Fix escaped quotes
+            .trim();
+        preview.innerHTML = micromark(markdownText);
+    };
+
+    // Initial render
+    updatePreview();
+
+    // Watch for content changes
+    const observer = new MutationObserver((mutations) => {
+        updatePreview();
+    });
+
+    observer.observe(noteContent, {
+        childList: true,
+        characterData: true,
+        subtree: true
+    });
+
+    console.log('Preview added:', preview.id);
 }
 
 // Initialize
 function init() {
-    // Listen for clicks on the document
-    document.addEventListener('click', handleNoteClick);
+    console.log('Initializing Keep Markdown');
+    
+    // First check if modal is already open
+    const existingModal = document.querySelector('.VIpgJd-TUo6Hb');
+    if (existingModal) {
+        console.log('Found existing modal');
+        handleNoteOpen(existingModal);
+    }
 
-    // Add close button to preview panel
-    const preview = createPreviewPanel();
-    const closeButton = document.createElement('button');
-    closeButton.textContent = '×';
-    closeButton.style.cssText = 'position:absolute;right:10px;top:10px;font-size:20px;cursor:pointer;';
-    closeButton.addEventListener('click', () => {
-        preview.classList.add('hidden');
-        document.body.classList.remove('markdown-preview-active');
+    // Watch for changes to the entire document
+    const observer = new MutationObserver((mutations) => {
+        console.log('Mutation detected:', mutations.length, 'changes');
+        
+        for (const mutation of mutations) {
+            // Check added nodes
+            for (const node of mutation.addedNodes) {
+                if (node.classList?.contains('VIpgJd-TUo6Hb')) {
+                    console.log('Modal added:', node);
+                    handleNoteOpen(node);
+                }
+            }
+            
+            // Also check for attribute changes that might indicate modal opening
+            if (mutation.type === 'attributes' && 
+                mutation.target.classList?.contains('VIpgJd-TUo6Hb')) {
+                console.log('Modal attributes changed:', mutation.target);
+                handleNoteOpen(mutation.target);
+            }
+        }
     });
-    preview.appendChild(closeButton);
+
+    // Observe everything
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class']
+    });
 }
 
 // Start when the page is ready
