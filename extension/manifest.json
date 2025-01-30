@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Keep Markdown",
+  "version": "1.0",
+  "description": "Markdown renderer for Google Keep",
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://keep.google.com/*"],
+      "js": ["dist/content.js"],
+      "css": ["styles.css"]
+    }
+  ]
+} 

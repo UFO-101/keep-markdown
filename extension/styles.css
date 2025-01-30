@@ -1,0 +1,22 @@
+.markdown-preview {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 40%;
+  height: 100%;
+  background: white;
+  border-left: 1px solid #e0e0e0;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.markdown-preview.hidden {
+  display: none;
+}
+
+/* Adjust Keep's main content when preview is shown */
+.markdown-preview-active .notes-container {
+  width: 60% !important;
+} 
