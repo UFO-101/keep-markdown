@@ -21,6 +21,27 @@ The extension adds a slider in the popup menu to control the width of the note m
 
 <img src="docs/screenshots/WidthSliderScreenshot.png" width="800" alt="Rendered markdown preview">
 
+## Chrome Extension Permissions
+
+This extension uses minimal permissions:
+
+### Content Script Host Access
+- The extension only runs on `https://keep.google.com/*` to:
+  1. Add the Markdown preview panel to the note editor
+  2. Listen for changes in the note content to update the preview
+  3. Apply custom styling for the preview panel
+  
+  The extension does not:
+  - Collect or transmit any note content
+  - Access any Google account information
+  - Modify or store your notes
+  - Make any network requests
+  
+  All processing is done locally in your browser.
+
+### storage Permission
+- Used to save your preferences (like the note modal width setting) between browser sessions. This ensures your customized settings persist after closing and reopening your browser.
+
 ## Getting Started
 
 1. Clone this repository

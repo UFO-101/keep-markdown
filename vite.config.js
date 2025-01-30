@@ -8,8 +8,7 @@ export default defineConfig({
             output: {
                 dir: 'extension/dist',
                 entryFileNames: 'content.js',
-                format: 'iife',
-                charset: 'utf-8'
+                format: 'iife'
             }
         },
         minify: false,
