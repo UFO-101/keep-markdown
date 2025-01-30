@@ -16,11 +16,12 @@
     background: #2a2b2e;  /* Slightly lighter than Keep's dark theme */
     color: #e8eaed;
     font-family: 'Google Sans', Roboto, Arial, sans-serif;
-    padding: 24px;
+    padding: 16px 24px;  /* Reduced top/bottom padding, kept sides the same */
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     overflow-wrap: break-word;
     overflow-y: auto;
+    margin: 8px;  /* Added margin around the preview */
 }
 
 /* Make the note content take up half the space */
