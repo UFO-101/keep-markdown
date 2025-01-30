@@ -4,8 +4,12 @@
   "version": "1.0",
   "description": "Markdown renderer for Google Keep",
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "storage"
   ],
+  "action": {
+    "default_popup": "popup.html"
+  },
   "content_scripts": [
     {
       "matches": ["https://keep.google.com/*"],

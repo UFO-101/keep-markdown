@@ -4566,6 +4566,8 @@
     return compile(options)(postprocess(parse(options).document().write(preprocess()(value, encoding, true))));
   }
   console.log("Keep Markdown extension loaded!");
+  let currentContentHeight = 70;
+  let currentModalWidth = 75;
   function createPreviewPanel(noteId) {
     console.log("Creating preview panel:", noteId);
     const preview = document.createElement("div");
@@ -4606,8 +4608,50 @@
     });
     console.log("Preview added:", preview.id);
   }
+  function updateDimensions(width, height) {
+    if (width) currentModalWidth = width;
+    if (height) currentContentHeight = height;
+    const style = document.createElement("style");
+    style.textContent = `
+        /* Modal width */
+        .VIpgJd-TUo6Hb.XKSfm-L9AdLc:has(.keep-md-preview) {
+            width: ${currentModalWidth}vw !important;
+        }
+        
+        /* Content height */
+        .keep-md-container {
+            height: ${currentContentHeight}vh !important;
+            overflow: hidden !important;
+        }
+        
+        /* Make content areas scrollable */
+        .keep-md-container .h1U9Be-YPqjbf,
+        .keep-md-preview {
+            height: 100% !important;
+            overflow-y: auto !important;
+        }
+    `;
+    const existingStyle = document.getElementById("keep-md-modal-style");
+    if (existingStyle) {
+      existingStyle.remove();
+    }
+    style.id = "keep-md-modal-style";
+    document.head.appendChild(style);
+  }
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === "updateModalWidth") {
+      updateDimensions(message.value, null);
+    } else if (message.type === "updateModalHeight") {
+      updateDimensions(null, message.value);
+    }
+  });
   function init() {
     console.log("Initializing Keep Markdown");
+    chrome.storage.sync.get(["modalWidth", "modalHeight"], function(result) {
+      if (result.modalWidth) currentModalWidth = result.modalWidth;
+      if (result.modalHeight) currentContentHeight = result.modalHeight;
+      updateDimensions();
+    });
     const existingModal = document.querySelector(".VIpgJd-TUo6Hb");
     if (existingModal) {
       console.log("Found existing modal");

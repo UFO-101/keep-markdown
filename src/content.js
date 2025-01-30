@@ -2,6 +2,10 @@ import {micromark} from 'micromark';
 
 console.log('Keep Markdown extension loaded!');
 
+// Add this near the top of the file, after the imports
+let currentContentHeight = 70;  // We'll only keep track of content height now
+let currentModalWidth = 75;     // Keep modal width
+
 // Create preview panel
 function createPreviewPanel(noteId) {
     console.log('Creating preview panel:', noteId);
@@ -67,9 +71,61 @@ function handleNoteOpen(modalNote) {
     console.log('Preview added:', preview.id);
 }
 
+function updateDimensions(width, height) {
+    // Update stored values
+    if (width) currentModalWidth = width;
+    if (height) currentContentHeight = height;
+    
+    const style = document.createElement('style');
+    style.textContent = `
+        /* Modal width */
+        .VIpgJd-TUo6Hb.XKSfm-L9AdLc:has(.keep-md-preview) {
+            width: ${currentModalWidth}vw !important;
+        }
+        
+        /* Content height */
+        .keep-md-container {
+            height: ${currentContentHeight}vh !important;
+            overflow: hidden !important;
+        }
+        
+        /* Make content areas scrollable */
+        .keep-md-container .h1U9Be-YPqjbf,
+        .keep-md-preview {
+            height: 100% !important;
+            overflow-y: auto !important;
+        }
+    `;
+    
+    // Remove any previous style element we added
+    const existingStyle = document.getElementById('keep-md-modal-style');
+    if (existingStyle) {
+        existingStyle.remove();
+    }
+    
+    style.id = 'keep-md-modal-style';
+    document.head.appendChild(style);
+}
+
+// Update the message listener
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'updateModalWidth') {
+        updateDimensions(message.value, null);
+    } else if (message.type === 'updateModalHeight') {
+        updateDimensions(null, message.value);
+    }
+});
+
 // Initialize
 function init() {
     console.log('Initializing Keep Markdown');
+    
+    // Load saved dimensions
+    chrome.storage.sync.get(['modalWidth', 'modalHeight'], function(result) {
+        if (result.modalWidth) currentModalWidth = result.modalWidth;
+        if (result.modalHeight) currentContentHeight = result.modalHeight;
+        updateDimensions();
+    });
     
     // First check if modal is already open
     const existingModal = document.querySelector('.VIpgJd-TUo6Hb');
