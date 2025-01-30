@@ -1,6 +1,6 @@
 # KeepDown
 
-<img src="extension/icons/KeepDown_Logo[256x256].png" width="128" alt="KeepDown Logo">
+<img src="extension/icons/KeepDown_Logo_256x256.png" width="128" alt="KeepDown Logo">
 
 A Chrome extension that adds real-time Markdown preview to Google Keep notes. Write your notes in Markdown and see them rendered instantly alongside your text.
 
