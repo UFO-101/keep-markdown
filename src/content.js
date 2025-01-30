@@ -1,4 +1,6 @@
 import {micromark} from 'micromark';
+import {gfm, gfmHtml} from 'micromark-extension-gfm';
+import {math, mathHtml} from 'micromark-extension-math';
 
 console.log('Keep Markdown extension loaded!');
 
@@ -50,7 +52,11 @@ function handleNoteOpen(modalNote) {
             .replace(/\\n/g, '\n')          // Handle newlines
             .replace(/\\"([^"]+)\\"/g, '"$1"') // Fix escaped quotes
             .trim();
-        preview.innerHTML = micromark(markdownText);
+        
+        preview.innerHTML = micromark(markdownText, {
+            extensions: [gfm(), math()],
+            htmlExtensions: [gfmHtml(), mathHtml()]
+        });
     };
 
     // Initial render

@@ -38,7 +38,11 @@
 .keep-md-preview h1 { font-size: 1.8em; margin-bottom: 16px; font-weight: 600; }
 .keep-md-preview h2 { font-size: 1.5em; margin-bottom: 12px; font-weight: 600; }
 .keep-md-preview h3 { font-size: 1.2em; margin-bottom: 8px; font-weight: 600; }
-.keep-md-preview p { margin-bottom: 12px; line-height: 1.5; white-space: pre-wrap; }
+.keep-md-preview p { 
+    margin-bottom: 12px; 
+    line-height: 1.5; 
+    white-space: normal;  /* Changed from pre-wrap */
+}
 .keep-md-preview em { font-style: italic; }
 .keep-md-preview strong { font-weight: 600; }
 .keep-md-preview code { 
@@ -57,6 +61,7 @@
 .keep-md-preview pre code {
     background: none;
     padding: 0;
+    white-space: pre;
 }
 .keep-md-preview ul, .keep-md-preview ol {
     margin: 12px 0;
@@ -115,4 +120,62 @@
     gap: 32px;
     width: 100%;
     min-width: 0;
+}
+
+/* Math styling */
+.keep-md-preview .math {
+    overflow-x: auto;
+    padding: 8px 0;
+    display: block;
+}
+
+.keep-md-preview .math-inline {
+    padding: 0 4px;
+    display: inline;
+}
+
+/* Hide LaTeX source */
+.keep-md-preview .katex-html {
+    display: none;
+}
+
+/* GFM Tables */
+.keep-md-preview table {
+    border-collapse: collapse;
+    margin: 16px 0;
+    width: 100%;
+}
+
+.keep-md-preview th,
+.keep-md-preview td {
+    border: 1px solid #5f6368;
+    padding: 8px;
+    text-align: left;
+}
+
+.keep-md-preview th {
+    background: #303134;
+}
+
+/* Task Lists */
+.keep-md-preview input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+/* Strikethrough */
+.keep-md-preview del {
+    color: #9aa0a6;
+}
+
+/* Only preserve line breaks in code blocks */
+.keep-md-preview pre code {
+    white-space: pre;
+}
+
+/* Ensure proper spacing between elements */
+.keep-md-preview * + p,
+.keep-md-preview * + h1,
+.keep-md-preview * + h2,
+.keep-md-preview * + h3 {
+    margin-top: 16px;
 } 
