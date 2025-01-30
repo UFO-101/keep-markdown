@@ -4,8 +4,6 @@
     gap: 32px;
     width: 100%;
     min-width: 0;
-    height: 70vh !important;
-    overflow: hidden !important;
 }
 
 .keep-md-content {
@@ -23,7 +21,6 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     overflow-wrap: break-word;
     overflow-y: auto;
-    height: 100% !important;
 }
 
 /* Make the note content take up half the space */
@@ -31,8 +28,6 @@
     flex: 1;
     margin: 0;
     min-width: 0;
-    height: 100% !important;
-    overflow-y: auto !important;
 }
 
 /* Markdown styles scoped to our preview */
@@ -82,6 +77,7 @@
 .VIpgJd-TUo6Hb.XKSfm-L9AdLc:has(.keep-md-preview) {
     position: fixed !important;
     width: 75vw !important;
+    height: 70vh !important;
     left: 50% !important;
     top: 50% !important;
     transform: translate(-50%, -50%) !important;

@@ -3,8 +3,7 @@ import {micromark} from 'micromark';
 console.log('Keep Markdown extension loaded!');
 
 // Add this near the top of the file, after the imports
-let currentContentHeight = 70;  // We'll only keep track of content height now
-let currentModalWidth = 75;     // Keep modal width
+let currentModalWidth = 75;  // Only keep width default
 
 // Create preview panel
 function createPreviewPanel(noteId) {
@@ -71,29 +70,30 @@ function handleNoteOpen(modalNote) {
     console.log('Preview added:', preview.id);
 }
 
-function updateDimensions(width, height) {
-    // Update stored values
+function updateModalDimensions(width) {
+    // Update stored width value
     if (width) currentModalWidth = width;
-    if (height) currentContentHeight = height;
     
     const style = document.createElement('style');
     style.textContent = `
-        /* Modal width */
+        /* Modal width only */
         .VIpgJd-TUo6Hb.XKSfm-L9AdLc:has(.keep-md-preview) {
             width: ${currentModalWidth}vw !important;
+            height: auto !important;
+            max-height: 95vh !important;
         }
-        
-        /* Content height */
-        .keep-md-container {
-            height: ${currentContentHeight}vh !important;
-            overflow: hidden !important;
-        }
-        
-        /* Make content areas scrollable */
-        .keep-md-container .h1U9Be-YPqjbf,
-        .keep-md-preview {
-            height: 100% !important;
+
+        /* Allow modal to scroll if content is very tall */
+        .VIpgJd-TUo6Hb.XKSfm-L9AdLc:has(.keep-md-preview) .IZ65Hb-n0tgWb,
+        .VIpgJd-TUo6Hb.XKSfm-L9AdLc:has(.keep-md-preview) .IZ65Hb-TBnied,
+        .VIpgJd-TUo6Hb.XKSfm-L9AdLc:has(.keep-md-preview) .IZ65Hb-s2gQvd {
+            height: auto !important;
             overflow-y: auto !important;
+        }
+
+        /* Container takes natural height */
+        .keep-md-container {
+            height: auto !important;
         }
     `;
     
@@ -107,12 +107,10 @@ function updateDimensions(width, height) {
     document.head.appendChild(style);
 }
 
-// Update the message listener
+// Update the message listener to only handle width
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'updateModalWidth') {
-        updateDimensions(message.value, null);
-    } else if (message.type === 'updateModalHeight') {
-        updateDimensions(null, message.value);
+        updateModalDimensions(message.value);
     }
 });
 
@@ -120,11 +118,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 function init() {
     console.log('Initializing Keep Markdown');
     
-    // Load saved dimensions
-    chrome.storage.sync.get(['modalWidth', 'modalHeight'], function(result) {
+    // Load saved width
+    chrome.storage.sync.get(['modalWidth'], function(result) {
         if (result.modalWidth) currentModalWidth = result.modalWidth;
-        if (result.modalHeight) currentContentHeight = result.modalHeight;
-        updateDimensions();
+        updateModalDimensions();
     });
     
     // First check if modal is already open

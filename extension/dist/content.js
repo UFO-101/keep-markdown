@@ -4566,7 +4566,6 @@
     return compile(options)(postprocess(parse(options).document().write(preprocess()(value, encoding, true))));
   }
   console.log("Keep Markdown extension loaded!");
-  let currentContentHeight = 70;
   let currentModalWidth = 75;
   function createPreviewPanel(noteId) {
     console.log("Creating preview panel:", noteId);
@@ -4608,27 +4607,28 @@
     });
     console.log("Preview added:", preview.id);
   }
-  function updateDimensions(width, height) {
+  function updateModalDimensions(width) {
     if (width) currentModalWidth = width;
-    if (height) currentContentHeight = height;
     const style = document.createElement("style");
     style.textContent = `
-        /* Modal width */
+        /* Modal width only */
         .VIpgJd-TUo6Hb.XKSfm-L9AdLc:has(.keep-md-preview) {
             width: ${currentModalWidth}vw !important;
+            height: auto !important;
+            max-height: 95vh !important;
         }
-        
-        /* Content height */
-        .keep-md-container {
-            height: ${currentContentHeight}vh !important;
-            overflow: hidden !important;
-        }
-        
-        /* Make content areas scrollable */
-        .keep-md-container .h1U9Be-YPqjbf,
-        .keep-md-preview {
-            height: 100% !important;
+
+        /* Allow modal to scroll if content is very tall */
+        .VIpgJd-TUo6Hb.XKSfm-L9AdLc:has(.keep-md-preview) .IZ65Hb-n0tgWb,
+        .VIpgJd-TUo6Hb.XKSfm-L9AdLc:has(.keep-md-preview) .IZ65Hb-TBnied,
+        .VIpgJd-TUo6Hb.XKSfm-L9AdLc:has(.keep-md-preview) .IZ65Hb-s2gQvd {
+            height: auto !important;
             overflow-y: auto !important;
+        }
+
+        /* Container takes natural height */
+        .keep-md-container {
+            height: auto !important;
         }
     `;
     const existingStyle = document.getElementById("keep-md-modal-style");
@@ -4640,17 +4640,14 @@
   }
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === "updateModalWidth") {
-      updateDimensions(message.value, null);
-    } else if (message.type === "updateModalHeight") {
-      updateDimensions(null, message.value);
+      updateModalDimensions(message.value);
     }
   });
   function init() {
     console.log("Initializing Keep Markdown");
-    chrome.storage.sync.get(["modalWidth", "modalHeight"], function(result) {
+    chrome.storage.sync.get(["modalWidth"], function(result) {
       if (result.modalWidth) currentModalWidth = result.modalWidth;
-      if (result.modalHeight) currentContentHeight = result.modalHeight;
-      updateDimensions();
+      updateModalDimensions();
     });
     const existingModal = document.querySelector(".VIpgJd-TUo6Hb");
     if (existingModal) {
